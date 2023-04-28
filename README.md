@@ -92,7 +92,7 @@ argocd_cr:
     sidecarContainers:
     - name: vault-plugin
       command: [/var/run/argocd/argocd-cmp-server]
-      image: quay.io/eformat/argocd-vault-sidecar:latest
+      image: quay.io/eformat/argocd-vault-sidecar:${IMAGE_TAG}
       securityContext:
         allowPrivilegeEscalation: false
         capabilities:
@@ -113,7 +113,7 @@ argocd_cr:
           name: cmp-tmp-vault
     - name: vault-plugin-helm
       command: [/var/run/argocd/argocd-cmp-server]
-      image: quay.io/eformat/argocd-vault-sidecar:latest
+      image: quay.io/eformat/argocd-vault-sidecar:${IMAGE_TAG}
       securityContext:
         allowPrivilegeEscalation: false
         capabilities:
