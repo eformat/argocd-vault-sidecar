@@ -2,7 +2,7 @@
 
 ArgoCD sidecar suitable for running the [ArgoCD Vault Plugin](https://argocd-vault-plugin.readthedocs.io/en/stable/installation/#custom-image-and-configuration-via-sidecar)
 
-# Example Usage
+## Example Usage
 
 I am using the [GitOps Operator Helm Chart](https://github.com/redhat-cop/helm-charts/tree/master/charts/gitops-operator) from the RedHat COP.
 
