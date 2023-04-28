@@ -6,7 +6,7 @@ ArgoCD sidecar suitable for running the [ArgoCD Vault Plugin](https://argocd-vau
 
 I am using the [GitOps Operator Helm Chart](https://github.com/redhat-cop/helm-charts/tree/master/charts/gitops-operator) from the RedHat COP.
 
-I have configured the vault service account with a long lived token for now. This should be [changed fo newer k8s](https://github.com/hashicorp/vault/blob/main/website/content/docs/auth/kubernetes.mdx#use-local-service-account-token-as-the-reviewer-jwt) to support short-lived tokens.
+I have configured the vault service account with a long lived token for now. This should be [changed for newer k8s](https://github.com/hashicorp/vault/blob/main/website/content/docs/auth/kubernetes.mdx#use-local-service-account-token-as-the-reviewer-jwt) to support short-lived tokens.
 
 ```bash
 export TEAM_NAME=rainforest
