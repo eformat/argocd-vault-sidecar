@@ -10,7 +10,7 @@ I am using the [GitOps Operator Helm Chart](https://github.com/redhat-cop/helm-c
 export TEAM_NAME=rainforest
 export SERVICE_ACCOUNT=vault
 export GIT_SERVER=gitlab-ce.apps.sno.sandbox1117.opentlc.com
-export IMAGE_TAG=2.6.7
+export IMAGE_TAG=$(cat VERSION)
 
 oc new-project ${TEAM_NAME}-ci-cd
 oc -n ${TEAM_NAME}-ci-cd create sa ${SERVICE_ACCOUNT}
