@@ -26,19 +26,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Setup S2i and Build container image from source
-      - name: Setup and Build
-        id: build_image
-        uses: redhat-actions/s2i-build@v2
-        with:
-          path_context: '.'
-          # Builder image for a java project
-          builder_image: 'registry.access.redhat.com/ubi9/openjdk-17:latest'
-          image: ${{ env.IMAGE_NAME }}
-          tags: ${{ env.TAGS }}
-          log_level: 2
-          include_git: true
-
       # Build runtime image from s2i image output
       - name: Buildah Action
         uses: redhat-actions/buildah-build@v2
