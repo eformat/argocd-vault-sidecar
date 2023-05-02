@@ -54,7 +54,7 @@ argocd_cr:
     - name: cmp-tmp-helm
       emptyDir: {}
     - name: cmp-tmp-kustomize
-      emptyDir: {}      
+      emptyDir: {}
     initContainers:
     - name: copy-cmp-server
       command:
@@ -197,4 +197,26 @@ helm upgrade --install argocd \
   --namespace ${TEAM_NAME}-ci-cd \
   -f /tmp/argocd-values.yaml \
   redhat-cop/gitops-operator
+```
+
+### Signature
+
+The public key of [argocd-vault-sidecar image](https://quay.io/repository/eformat/argocd-vault-sidecar)
+
+[Cosign](https://github.com/sigstore/cosign) public key:
+
+```shell
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEakwO+HEdPrtGO0bfkSiFaOwRTGVJ
+rdH2gzTrs5DilXAnomraaA7Uv1ZoAyl5KQqsQ4suSr346aBm7Yrqxo4xYg==
+-----END PUBLIC KEY-----
+```
+
+The public key is also available online: <https://raw.githubusercontent.com/eformat/argocd-vault-sidecar/master/cosign.pub>
+
+To verify an image:
+
+```shell
+curl --progress-bar -o cosign.pub https://raw.githubusercontent.com/eformat/argocd-vault-sidecar/master/cosign.pub
+cosign verify --key cosign.pub quay.io/eformat/argocd-vault-sidecar:${VERSION}
 ```

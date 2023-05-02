@@ -1,0 +1,86 @@
+name: Build containers
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+      - 'README.md'
+  workflow_dispatch:
+
+env:
+  REGISTRY: quay.io
+  IMAGE_NAME: ${{ github.repository }}
+  TAGS: latest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # Setup S2i and Build container image from source
+      - name: Setup and Build
+        id: build_image
+        uses: redhat-actions/s2i-build@v2
+        with:
+          path_context: '.'
+          # Builder image for a java project
+          builder_image: 'registry.access.redhat.com/ubi9/openjdk-17:latest'
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.TAGS }}
+          log_level: 2
+          include_git: true
+
+      # Build runtime image from s2i image output
+      - name: Buildah Action
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.TAGS }}
+          containerfiles: |
+            ./Dockerfile
+
+      # Login to Registry
+      - name: Log in to the Container registry
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.QUAY_USER }}      # ${{ github.actor }} - for ghcr.io
+          password: ${{ secrets.QUAY_TOKEN }}     # quay.io
+      #   password: ${{ secrets.GITHUB_TOKEN }}   # ghcr.io
+
+      - name: Push to Container Repository
+        id: push-to-registry
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.TAGS }}
+          registry: ${{ env.REGISTRY }}
+
+      # Provenance signing image
+      - name: Install cosign
+        uses: sigstore/cosign-installer@c3667d99424e7e6047999fb6246c0da843953c65 # v3.0.1
+        with:
+          cosign-release: 'v2.0.0'
+
+      - name: Write signing key to disk (only needed for `cosign sign --key`)
+        run: echo "${{ secrets.SIGNING_SECRET }}" > cosign.key
+
+      - name: Sign container image with annotations from our environment
+        run: |
+          cosign sign --key cosign.key \
+            -a "repo=${{ github.repository }}" \
+            -a "workflow=${{ github.workflow }}" \
+            -a "ref=${{ github.sha }}" \
+            -y \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAGS }}
+        env:
+          COSIGN_PASSWORD: ""
