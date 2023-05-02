@@ -21,6 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Get version
+        id: vars
+        run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
@@ -31,7 +35,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: ${{ env.TAGS }}
+          tags: ${{ env.TAGS }} ${{ steps.vars.outputs.version }}
           containerfiles: |
             ./Dockerfile
 
@@ -49,7 +53,7 @@ jobs:
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: ${{ env.TAGS }}
+          tags: ${{ env.TAGS }} ${{ steps.vars.outputs.version }}
           registry: ${{ env.REGISTRY }}
 
       # Provenance signing image
@@ -61,7 +65,7 @@ jobs:
       - name: Write signing key to disk (only needed for `cosign sign --key`)
         run: echo "${{ secrets.SIGNING_SECRET }}" > cosign.key
 
-      - name: Sign container image with annotations from our environment
+      - name: Sign container image with TAGS
         run: |
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
@@ -69,5 +73,16 @@ jobs:
             -a "ref=${{ github.sha }}" \
             -y \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAGS }}
+        env:
+          COSIGN_PASSWORD: ""
+
+      - name: Sign container image with VERSION
+        run: |
+          cosign sign --key cosign.key \
+            -a "repo=${{ github.repository }}" \
+            -a "workflow=${{ github.workflow }}" \
+            -a "ref=${{ github.sha }}" \
+            -y \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}
         env:
           COSIGN_PASSWORD: ""
