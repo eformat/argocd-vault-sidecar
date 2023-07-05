@@ -2,7 +2,7 @@ FROM registry.access.redhat.com/ubi9/ubi:9.2
 
 USER root
 
-ENV ARGOCD_VERSION=2.7.5 \
+ENV ARGOCD_VERSION=2.7.7 \
     HELM_VERSION=3.12.1 \
     KUSTOMIZE_VERSION=5.0.3 \
     AVP_VERSION=1.14.0
