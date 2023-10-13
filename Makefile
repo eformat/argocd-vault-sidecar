@@ -1,7 +1,7 @@
 # Image URL to use all building/pushing image targets
 REGISTRY ?= quay.io
 REPOSITORY ?= $(REGISTRY)/eformat/argocd-vault-sidecar
-TAG ?= 2.7.13 # match the argocd version tag
+TAG ?= 2.8.3 # match the argocd version tag
 
 IMG := $(REPOSITORY):$(TAG)
 
