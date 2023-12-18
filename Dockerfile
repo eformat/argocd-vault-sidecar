@@ -1,11 +1,11 @@
-FROM registry.access.redhat.com/ubi9/ubi:9.2
+FROM registry.access.redhat.com/ubi9/ubi:9.3
 
 USER root
 
-ENV ARGOCD_VERSION=2.8.6 \
-    HELM_VERSION=3.13.1 \
-    KUSTOMIZE_VERSION=5.1.1 \
-    AVP_VERSION=1.16.1
+ENV ARGOCD_VERSION=2.9.2 \
+    HELM_VERSION=3.13.3 \
+    KUSTOMIZE_VERSION=5.3.0 \
+    AVP_VERSION=1.17.0
 
 # Install git and friends
 RUN dnf -y install \

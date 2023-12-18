@@ -58,7 +58,7 @@ jobs:
 
       # Provenance signing image
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3.1.1
+        uses: sigstore/cosign-installer@v3
         with:
           cosign-release: 'v2.1.1'
 
