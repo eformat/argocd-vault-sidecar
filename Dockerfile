@@ -2,9 +2,9 @@ FROM registry.access.redhat.com/ubi9/ubi:9.4
 
 USER root
 
-ENV ARGOCD_VERSION=2.10.12 \
-    HELM_VERSION=3.15.1 \
-    KUSTOMIZE_VERSION=5.4.2 \
+ENV ARGOCD_VERSION=2.11.6 \
+    HELM_VERSION=3.15.3 \
+    KUSTOMIZE_VERSION=5.4.3 \
     AVP_VERSION=1.18.1
 
 # Install git and friends
