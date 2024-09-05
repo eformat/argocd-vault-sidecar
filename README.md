@@ -49,11 +49,24 @@ argocd_cr:
         - key: kustomize-plugin.yaml
           path: plugin.yaml
           mode: 509
+    - configMap:
+        name: argocd-vault-plugins
+        items:
+        - key: sops-age-plugin.yaml
+          path: plugin.yaml
+          mode: 509
+      name: sops-age-plugin
+    - name: sops-age-key
+      secret:
+        defaultMode: 420
+        secretName: sops-age-key
     - name: cmp-tmp-vault
       emptyDir: {}
     - name: cmp-tmp-helm
       emptyDir: {}
     - name: cmp-tmp-kustomize
+      emptyDir: {}
+    - name: cmp-tmp-sops-age
       emptyDir: {}
     initContainers:
     - name: copy-cmp-server
@@ -141,6 +154,34 @@ argocd_cr:
           name: plugins
         - mountPath: /tmp
           name: cmp-tmp-kustomize
+    - command: [/var/run/argocd/argocd-cmp-server]
+      env:
+        - name: SOPS_AGE_KEY_FILE
+          value: /var/run/secrets/age-key.txt
+      image: 'quay.io/eformat/argocd-vault-sidecar:2.11.6'
+      name: sops-age-plugin
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumeMounts:
+        - mountPath: /var/run/argocd
+          name: var-files
+        - mountPath: /home/argocd/cmp-server/config
+          name: sops-age-plugin
+        - mountPath: /home/argocd/cmp-server/plugins
+          name: plugins
+        - mountPath: /tmp
+          name: cmp-tmp-sops-age
+        - mountPath: /var/run/secrets
+          name: sops-age-key
+          readOnly: true
   initialRepositories: |
     - name: rainforest
       url: https://${GIT_SERVER}/${TEAM_NAME}/data-mesh-pattern.git
@@ -155,6 +196,7 @@ argocd_cr:
         name: git-auth
 EOF
 
+## plugins
 oc apply -n ${TEAM_NAME}-ci-cd -f- <<EOF
 apiVersion: v1
 kind: ConfigMap
@@ -191,8 +233,32 @@ data:
       generate:
         command: ["sh", "-c"]
         args: ["kustomize build . | argocd-vault-plugin -s ${TEAM_NAME}-ci-cd:team-avp-credentials generate -"]
+  sops-age-plugin.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: argocd-sops-age-plugin
+    spec:
+      generate:
+        command: ["sh", "-c"]
+        args: ['AVP_TYPE=sops argocd-vault-plugin generate ./']
 EOF
 
+## sops and age
+oc apply -n ${TEAM_NAME}-ci-cd -f- <<EOF
+apiVersion: v1
+stringData:
+  age-key.txt: |
+    # public key: ageXXX
+    AGE-SECRET-KEY-XXX
+kind: Secret
+metadata:
+  name: sops-age-key
+  namespace: openshift-gitops
+type: Opaque
+EOF
+
+## deploy
 helm upgrade --install argocd \
   --namespace ${TEAM_NAME}-ci-cd \
   -f /tmp/argocd-values.yaml \
