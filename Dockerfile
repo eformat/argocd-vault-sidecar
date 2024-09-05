@@ -2,9 +2,10 @@ FROM registry.access.redhat.com/ubi9/ubi:9.4
 
 USER root
 
-ENV ARGOCD_VERSION=2.11.6 \
-    HELM_VERSION=3.15.3 \
+ENV HELM_VERSION=3.15.3 \
     KUSTOMIZE_VERSION=5.4.3 \
+    AGE_VERSGION=1.2.0 \
+    SOPS_VERSION=3.9.0 \
     AVP_VERSION=1.18.1
 
 # Install git and friends
@@ -34,5 +35,20 @@ RUN curl -skL -o /tmp/kustomize.tar.gz https://github.com/kubernetes-sigs/kustom
     chmod -R 775 /usr/local/bin/kustomize && \
     rm -rf /tmp/linux-amd64 && \
     echo "🐾🐾🐾🐾🐾"
+
+# Install age
+RUN curl -skL -o /tmp/age.tar.gz https://github.com/FiloSottile/age/releases/download/v${AGE_VERSGION}/age-v${AGE_VERSGION}-linux-amd64.tar.gz && \
+    tar -C /tmp -xzf /tmp/age.tar.gz && \
+    mv -v /tmp/age/age /usr/local/bin && \
+    mv -v /tmp/age/age-keygen /usr/local/bin && \
+    chmod -R 775 /usr/local/bin/age && \
+    chmod -R 775 /usr/local/bin/age-keygen && \
+    rm -rf /tmp/age && \
+    echo "🪩🪩🪩🪩🪩"
+
+# Install sops
+RUN curl -skL -o /usr/local/bin/sops https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64 && \
+    chmod -R 775 /usr/local/bin/sops && \
+    echo "🎤🎤🎤🎤🎤"
 
 USER 999
