@@ -158,7 +158,7 @@ argocd_cr:
       env:
         - name: SOPS_AGE_KEY_FILE
           value: /var/run/secrets/age-key.txt
-      image: 'quay.io/eformat/argocd-vault-sidecar:2.11.6'
+      image: quay.io/eformat/argocd-vault-sidecar:${IMAGE_TAG}
       name: sops-age-plugin
       resources: {}
       securityContext:
