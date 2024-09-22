@@ -2,7 +2,7 @@ FROM registry.access.redhat.com/ubi9/ubi:9.4
 
 USER root
 
-ENV HELM_VERSION=3.15.3 \
+ENV HELM_VERSION=3.16.1 \
     KUSTOMIZE_VERSION=5.4.3 \
     AGE_VERSGION=1.2.0 \
     SOPS_VERSION=3.9.0 \
