@@ -2,10 +2,10 @@ FROM registry.access.redhat.com/ubi9/ubi:9.5
 
 USER root
 
-ENV HELM_VERSION=3.16.2 \
-    KUSTOMIZE_VERSION=5.5.0 \
-    AGE_VERSGION=1.2.0 \
-    SOPS_VERSION=3.9.1 \
+ENV HELM_VERSION=3.17.3 \
+    KUSTOMIZE_VERSION=5.6.0 \
+    AGE_VERSGION=1.2.1 \
+    SOPS_VERSION=3.10.2 \
     AVP_VERSION=1.18.1
 
 # Install git and friends
